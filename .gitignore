@@ -1,0 +1,6 @@
+# Compiled output
+*.class
+out/
+
+# VS Code
+.vscode/

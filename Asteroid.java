@@ -34,13 +34,17 @@ class Asteroid extends Polygon {
     }
 
     public void draw(Graphics brush) {
-        brush.setColor(Color.gray);
         Point[] points = getPoints();
+        int[] xp = new int[points.length];
+        int[] yp = new int[points.length];
         for (int i = 0; i < points.length; i++) {
-            int next = (i + 1) % points.length;
-            brush.drawLine((int) points[i].x, (int) points[i].y, (int) points[next].x, (int) points[next].y
-            );
+            xp[i] = (int) points[i].x;
+            yp[i] = (int) points[i].y;
         }
+        brush.setColor(Color.gray);
+        brush.fillPolygon(xp, yp, points.length);
+        brush.setColor(Color.darkGray);
+        brush.drawPolygon(xp, yp, points.length);
     }
 
     public static void updateAsteroids(ArrayList<Asteroid> asteroids, int width, int height) {

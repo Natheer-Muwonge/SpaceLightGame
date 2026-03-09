@@ -14,7 +14,7 @@ class YourGameName extends Game {
     static int counter = 0;
 
     public YourGameName() {
-        super("Rocket Rush!", 800, 600);
+        super("Rocket Rush", 800, 600);
         this.setFocusable(true);
         this.requestFocus();
 

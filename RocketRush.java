@@ -20,12 +20,13 @@ public class RocketRush extends Game {
 
     private Ship ship;
     private ArrayList<Asteroid> asteroids;
-    private ArrayList<SpaceOrb> orbs;
+    private ArrayList<SpaceOrbs> orbs;
 
     private int lives;
     private GameState gameState;
     private Spawner spawner;
     private ScoreManager scoreManager;
+    private ArrayList<ScorePopup> popups;
 
     /**
      * Creates a new Rocket Rush game window and initializes the game.
@@ -35,6 +36,7 @@ public class RocketRush extends Game {
 
         asteroids = new ArrayList<>();
         orbs = new ArrayList<>();
+        popups = new ArrayList<>();
         spawner = new Spawner(45, 180);
         scoreManager = new ScoreManager();
         lives = STARTING_LIVES;
@@ -43,7 +45,6 @@ public class RocketRush extends Game {
         initializeShip();
 
         this.setFocusable(true);
-        this.requestFocus();
 
         this.addKeyListener(new KeyAdapter() {
             @Override
@@ -96,6 +97,12 @@ public class RocketRush extends Game {
         });
     }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        requestFocus();
+    }
+
     /**
      * Initializes the player's ship at the center of the screen.
      */
@@ -116,6 +123,7 @@ public class RocketRush extends Game {
     private void resetGame() {
         asteroids.clear();
         orbs.clear();
+        popups.clear();
         spawner.reset();
         scoreManager.resetCurrentScore();
         lives = STARTING_LIVES;
@@ -130,15 +138,19 @@ public class RocketRush extends Game {
         spawnElements();
 
         if (ship != null) {
-            ship.move(WIDTH, HEIGHT);
+            ship.move();
+            ship.wrapAround(WIDTH, HEIGHT);
         }
 
-        for (Asteroid asteroid : asteroids) {
-            asteroid.move(WIDTH, HEIGHT);
-        }
+        Asteroid.updateAsteroids(asteroids, WIDTH, HEIGHT);
+        SpaceOrbs.updateOrbs(orbs);
 
-        for (SpaceOrb orb : orbs) {
-            orb.move(WIDTH, HEIGHT);
+        Iterator<ScorePopup> popupIter = popups.iterator();
+        while (popupIter.hasNext()) {
+            ScorePopup p = popupIter.next();
+            p.y -= 1;
+            p.framesLeft--;
+            if (p.framesLeft <= 0) popupIter.remove();
         }
 
         handleCollisions();
@@ -153,36 +165,25 @@ public class RocketRush extends Game {
             Point spawnPoint = spawner.randomEdgePoint(WIDTH, HEIGHT);
 
             Point[] asteroidShape = {
-                new Point(0, 10),
-                new Point(10, 0),
-                new Point(25, 5),
-                new Point(30, 20),
-                new Point(15, 30),
-                new Point(0, 25)
+                new Point(0, 20),
+                new Point(20, 0),
+                new Point(50, 10),
+                new Point(60, 40),
+                new Point(30, 60),
+                new Point(0, 50)
             };
 
             asteroids.add(new Asteroid(
                 asteroidShape,
                 spawnPoint,
-                spawner.randomRotation()
+                spawner.randomRotation(),
+                2.5
             ));
         }
 
         if (spawner.shouldSpawnOrb()) {
             Point spawnPoint = spawner.randomInteriorPoint(WIDTH, HEIGHT, 60);
-
-            Point[] orbShape = {
-                new Point(0, 8),
-                new Point(8, 0),
-                new Point(16, 8),
-                new Point(8, 16)
-            };
-
-            orbs.add(new SpaceOrb(
-                orbShape,
-                spawnPoint,
-                0
-            ));
+            orbs.add(new SpaceOrbs(spawnPoint));
         }
     }
 
@@ -208,10 +209,11 @@ public class RocketRush extends Game {
             }
         }
 
-        Iterator<SpaceOrb> orbIterator = orbs.iterator();
+        Iterator<SpaceOrbs> orbIterator = orbs.iterator();
         while (orbIterator.hasNext()) {
-            SpaceOrb orb = orbIterator.next();
+            SpaceOrbs orb = orbIterator.next();
             if (ship.collides(orb)) {
+                popups.add(new ScorePopup((int) orb.position.x, (int) orb.position.y));
                 orbIterator.remove();
                 scoreManager.addOrbBonus();
             }
@@ -233,15 +235,21 @@ public class RocketRush extends Game {
         }
 
         if (ship != null) {
-            ship.paint(brush);
+            ship.draw(brush);
         }
 
         for (Asteroid asteroid : asteroids) {
-            asteroid.paint(brush);
+            asteroid.draw(brush);
         }
 
-        for (SpaceOrb orb : orbs) {
-            orb.paint(brush);
+        for (SpaceOrbs orb : orbs) {
+            orb.draw(brush);
+        }
+
+        brush.setColor(new Color(255, 215, 0));
+        brush.setFont(new Font("Arial", Font.BOLD, 18));
+        for (ScorePopup p : popups) {
+            brush.drawString("+100", p.x - 15, p.y);
         }
 
         drawHud(brush);
@@ -280,11 +288,21 @@ public class RocketRush extends Game {
 
         brush.drawString("Score: " + scoreManager.getScore(), 20, 30);
         brush.drawString("High Score: " + scoreManager.getHighScore(), 20, 55);
-        brush.drawString("Lives: " + lives, 20, 80);
-        brush.drawString("State: " + gameState, 20, 105);
 
-        brush.drawString("Controls: W/Up = move, A/Left = turn left, D/Right = turn right, P = pause",
-                20, HEIGHT - 20);
+        for (int i = 0; i < lives; i++) {
+            brush.setColor(Color.red);
+            drawHeart(brush, 20 + i * 28, 75, 10);
+        }
+        for (int i = lives; i < STARTING_LIVES; i++) {
+            brush.setColor(new Color(80, 0, 0));
+            drawHeart(brush, 20 + i * 28, 75, 10);
+        }
+
+        brush.setColor(Color.white);
+        brush.drawString("State: " + gameState, 20, 110);
+
+        brush.drawString("Controls: W:Up, A: Left Turn, D: Right Turn, P: Pause Game",
+                20, HEIGHT - 40);
     }
 
     /**
@@ -317,6 +335,19 @@ public class RocketRush extends Game {
      * The current score increases by 1 every second while playing,
      * and increases by 5 whenever an orb is collected.
      */
+    private void drawHeart(Graphics brush, int cx, int cy, int s) {
+        brush.fillArc(cx - s, cy - s / 2, s, s, 0, 180);
+        brush.fillArc(cx, cy - s / 2, s, s, 0, 180);
+        int[] xp = {cx - s, cx + s, cx};
+        int[] yp = {cy, cy, cy + s};
+        brush.fillPolygon(xp, yp, 3);
+    }
+
+    private class ScorePopup {
+        int x, y, framesLeft;
+        ScorePopup(int x, int y) { this.x = x; this.y = y; this.framesLeft = 40; }
+    }
+
     private class ScoreManager {
         private int score;
         private int highScore;
@@ -347,7 +378,7 @@ public class RocketRush extends Game {
          * Adds the orb collection bonus.
          */
         public void addOrbBonus() {
-            score += 5;
+            score += 100;
         }
 
         /**

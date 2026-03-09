@@ -9,6 +9,7 @@ class SpaceOrbs extends Polygon implements Collectable {
     private static final int RADIUS = 10;
 
     private boolean collected = false;
+    private int framesLeft = 125;
 
     public SpaceOrbs(Point position) {
         super(
@@ -42,14 +43,14 @@ class SpaceOrbs extends Polygon implements Collectable {
         if (collected) {
             return;
         }
-        brush.setColor(new Color(0, 210, 255));
+        brush.setColor(Color.yellow);
         brush.fillOval(
             (int) position.x - RADIUS,
             (int) position.y - RADIUS,
             RADIUS * 2,
             RADIUS * 2
         );
-        brush.setColor(Color.white);
+        brush.setColor(new Color(200, 160, 0));
         brush.drawOval(
             (int) position.x - RADIUS,
             (int) position.y - RADIUS,
@@ -60,7 +61,9 @@ class SpaceOrbs extends Polygon implements Collectable {
 
     public static void updateOrbs(ArrayList<SpaceOrbs> orbs) {
         for (int i = orbs.size() - 1; i >= 0; i--) {
-            if (orbs.get(i).isCollected()) {
+            SpaceOrbs orb = orbs.get(i);
+            orb.framesLeft--;
+            if (orb.isCollected() || orb.framesLeft <= 0) {
                 orbs.remove(i);
             }
         }

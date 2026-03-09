@@ -4,15 +4,28 @@ import java.awt.*;
 
 class Ship extends Polygon {
 
-    private static final double speed = 4.0;
+    private static final double SPEED = 4.0;
+    private static final double ROTATE_SPEED = 5.0;
+
+    private boolean forwardPressed = false;
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
 
     public Ship(Point[] shape, Point position, double rotation) {
         super(shape, position, rotation);
     }
 
+    public void setForwardPressed(boolean b) { forwardPressed = b; }
+    public void setLeftPressed(boolean b) { leftPressed = b; }
+    public void setRightPressed(boolean b) { rightPressed = b; }
+
     public void move() {
-        position.x += Math.cos(Math.toRadians(rotation)) * speed;
-        position.y += Math.sin(Math.toRadians(rotation)) * speed;
+        if (leftPressed) rotation -= ROTATE_SPEED;
+        if (rightPressed) rotation += ROTATE_SPEED;
+        if (forwardPressed) {
+            position.x += Math.cos(Math.toRadians(rotation)) * SPEED;
+            position.y += Math.sin(Math.toRadians(rotation)) * SPEED;
+        }
     }
 
     public void wrapAround(int width, int height) {
