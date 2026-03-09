@@ -71,6 +71,26 @@ class Polygon {
     }
     return crossingNumber%2 == 1;
   }
+
+  
+  public boolean collides(Polygon other) {
+    Point[] thisPoints = this.getPoints();
+    Point[] otherPoints = other.getPoints();
+
+    for (Point p : thisPoints) {
+        if (other.contains(p)) {
+            return true;
+        }
+    }
+
+    for (Point p : otherPoints) {
+        if (this.contains(p)) {
+            return true;
+        }
+    }
+
+    return false;
+}
   
   public void rotate(int degrees) {rotation = (rotation+degrees)%360;}
   
