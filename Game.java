@@ -23,8 +23,10 @@ abstract class Game extends Canvas {
     frame.setSize(width,height);
     frame.setVisible(true);
     frame.setResizable(false);
-    frame.addWindowListener(new WindowAdapter() { 
-      public void windowClosing(WindowEvent e) {System.exit(0);} 
+    frame.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent e) {
+        System.exit(0);
+      }
     });
     
     buffer = createImage(width, height);
@@ -39,7 +41,10 @@ abstract class Game extends Canvas {
   public void update(Graphics brush) {
     paint(buffer.getGraphics());
 		brush.drawImage(buffer,0,0,this);
-    if (on) {sleep(10); repaint();}
+    if (on) {
+      sleep(10);
+      repaint();
+    }
   }
   
   // 'sleep' is a simple helper function used in 'update'.

@@ -150,7 +150,9 @@ public class RocketRush extends Game {
             ScorePopup p = popupIter.next();
             p.y -= 1;
             p.framesLeft--;
-            if (p.framesLeft <= 0) popupIter.remove();
+            if (p.framesLeft <= 0) {
+                popupIter.remove();
+            }
         }
 
         handleCollisions();
@@ -191,6 +193,9 @@ public class RocketRush extends Game {
      * Handles collisions between the ship and other elements.
      */
     private void handleCollisions() {
+        if (ship == null) {
+            return;
+        }
         Iterator<Asteroid> asteroidIterator = asteroids.iterator();
         while (asteroidIterator.hasNext()) {
             Asteroid asteroid = asteroidIterator.next();
@@ -274,7 +279,6 @@ public class RocketRush extends Game {
             );
         }
 
-        repaint();
     }
 
     /**

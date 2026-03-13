@@ -28,8 +28,12 @@ class Polygon {
     // First, we find the shape's top-most left-most boundary, its origin.
     Point origin = shape[0].clone();
     for (Point p : shape) {
-      if (p.x < origin.x) origin.x = p.x;
-      if (p.y < origin.y) origin.y = p.y;
+      if (p.x < origin.x) {
+        origin.x = p.x;
+      }
+      if (p.y < origin.y) {
+        origin.y = p.y;
+      }
     }
     
     // Then, we orient all of its points relative to the real origin.
@@ -92,7 +96,9 @@ class Polygon {
     return false;
 }
   
-  public void rotate(int degrees) {rotation = (rotation+degrees)%360;}
+  public void rotate(int degrees) {
+    rotation = (rotation + degrees) % 360;
+  }
   
   /*
   The following methods are private access restricted because, as this access
@@ -119,6 +125,9 @@ class Polygon {
                * (shape[i].x * shape[j].y - shape[j].x * shape[i].y);
     }
     double area = findArea();
-    return new Point(Math.abs(sum.x/(6*area)),Math.abs(sum.y/(6*area)));
+    if (area == 0) {
+      return new Point(0, 0);
+    }
+    return new Point(sum.x / (6 * area), sum.y / (6 * area));
   }
 }

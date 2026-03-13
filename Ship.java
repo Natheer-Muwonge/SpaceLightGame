@@ -20,8 +20,12 @@ class Ship extends Polygon {
     public void setRightPressed(boolean b) { rightPressed = b; }
 
     public void move() {
-        if (leftPressed) rotation -= ROTATE_SPEED;
-        if (rightPressed) rotation += ROTATE_SPEED;
+        if (leftPressed) {
+            rotation -= ROTATE_SPEED;
+        }
+        if (rightPressed) {
+            rotation += ROTATE_SPEED;
+        }
         if (forwardPressed) {
             position.x += Math.cos(Math.toRadians(rotation)) * SPEED;
             position.y += Math.sin(Math.toRadians(rotation)) * SPEED;
