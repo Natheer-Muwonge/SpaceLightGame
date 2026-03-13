@@ -10,8 +10,7 @@ import java.util.Iterator;
 
 /**
  * Main game controller for Rocket Rush.
- * This class manages state, keyboard input, score, spawning, collisions,
- * and rendering.
+ * Manages game state, keyboard input, score, spawning, collisions, and rendering.
  */
 public class RocketRush extends Game {
     private static final int WIDTH = 800;
@@ -61,7 +60,7 @@ public class RocketRush extends Game {
 
                 if (code == KeyEvent.VK_P) {
                     if (gameState == GameState.PLAYING) {
-                       gameState = GameState.PAUSED;
+                        gameState = GameState.PAUSED;
                         stopShipInput();
                     } else if (gameState == GameState.PAUSED) {
                         gameState = GameState.PLAYING;
@@ -100,6 +99,9 @@ public class RocketRush extends Game {
         });
     }
 
+    /**
+     * Requests focus so the game window receives keyboard input.
+     */
     @Override
     public void addNotify() {
         super.addNotify();
@@ -193,7 +195,7 @@ public class RocketRush extends Game {
     }
 
     /**
-     * Handles collisions between the ship and other elements.
+     * Handles collisions between the ship and asteroids or orbs.
      */
     private void handleCollisions() {
         if (ship == null) {
@@ -229,9 +231,8 @@ public class RocketRush extends Game {
     }
 
     /**
-     * Paints the entire game screen.
-     *
-     * @param brush graphics brush used to draw
+     * Paints the entire game screen each frame.
+     * @param brush the graphics context used for drawing
      */
     @Override
     public void paint(Graphics brush) {
@@ -250,9 +251,7 @@ public class RocketRush extends Game {
             asteroid.draw(brush);
         }
 
-        for (SpaceOrbs orb : orbs) {
-            orb.draw(brush);
-        }
+        orbs.forEach(orb -> orb.draw(brush));
 
         brush.setColor(new Color(255, 215, 0));
         brush.setFont(new Font("Arial", Font.BOLD, 18));
@@ -272,9 +271,8 @@ public class RocketRush extends Game {
     }
 
     /**
-     * Draws the score, high score, lives, and state text.
-     *
-     * @param brush graphics brush used to draw
+     * Draws the HUD showing score, high score, lives, and controls.
+     * @param brush the graphics context used for drawing
      */
     private void drawHud(Graphics brush) {
         brush.setColor(Color.white);
@@ -294,17 +292,15 @@ public class RocketRush extends Game {
 
         brush.setColor(Color.white);
         brush.drawString("State: " + gameState, 20, 110);
-
-        brush.drawString("Controls: W:Up, A: Left Turn, D: Right Turn, P: Pause Game",
-                20, HEIGHT - 40);
+        brush.drawString("Controls: W:Up, A: Left Turn, D: Right Turn, P: Pause Game", 20, HEIGHT - 40);
     }
 
     /**
-     * Draws a centered message on screen.
+     * Draws a centered message on screen at the given y position.
      *
-     * @param brush graphics brush used to draw
-     * @param message text to display
-     * @param y y-coordinate for the message
+     * @param brush the graphics context used for drawing
+     * @param message the text to display
+     * @param y the y-coordinate for the message
      */
     private void drawCenteredMessage(Graphics brush, String message, int y) {
         brush.setColor(Color.white);
@@ -315,50 +311,64 @@ public class RocketRush extends Game {
     }
 
     /**
-    * Stops all current ship movement input so that the ship remains still
-    * while the game is paused.
-    */
+     * Stops all ship movement input, used when the game is paused.
+     */
     private void stopShipInput() {
-    if (ship != null) {
-        ship.setForwardPressed(false);
-        ship.setLeftPressed(false);
-        ship.setRightPressed(false);
-    }
+        if (ship != null) {
+            ship.setForwardPressed(false);
+            ship.setLeftPressed(false);
+            ship.setRightPressed(false);
+        }
     }
 
     /**
-    * Draws the pause menu overlay on the screen, including the current score,
-    * high score, remaining lives, and resume instructions.
-    *
-    * @param brush graphics brush used to draw the pause menu
-    */
-   
+     * Draws the pause menu overlay showing score, high score, lives, and resume instructions.
+     *
+     * @param brush the graphics context used for drawing
+     */
     private void drawPauseMenu(Graphics brush) {
-    brush.setColor(new Color(0, 0, 0, 170));
-    brush.fillRect(0, 0, WIDTH, HEIGHT);
+        brush.setColor(new Color(0, 0, 0, 170));
+        brush.fillRect(0, 0, WIDTH, HEIGHT);
 
-    int boxWidth = 320;
-    int boxHeight = 220;
-    int boxX = (WIDTH - boxWidth) / 2;
-    int boxY = (HEIGHT - boxHeight) / 2;
+        int boxWidth = 320;
+        int boxHeight = 220;
+        int boxX = (WIDTH - boxWidth) / 2;
+        int boxY = (HEIGHT - boxHeight) / 2;
 
-    brush.setColor(Color.darkGray);
-    brush.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+        brush.setColor(Color.darkGray);
+        brush.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
 
-    brush.setColor(Color.white);
-    brush.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+        brush.setColor(Color.white);
+        brush.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
 
-    brush.setFont(new Font("Arial", Font.BOLD, 28));
-    brush.drawString("PAUSED", boxX + 95, boxY + 40);
+        brush.setFont(new Font("Arial", Font.BOLD, 28));
+        brush.drawString("PAUSED", boxX + 95, boxY + 40);
 
-    brush.setFont(new Font("Arial", Font.PLAIN, 18));
-    brush.drawString("Current Score: " + scoreManager.getScore(), boxX + 70, boxY + 90);
-    brush.drawString("High Score: " + scoreManager.getHighScore(), boxX + 78, boxY + 125);
-    brush.drawString("Lives Left: " + lives, boxX + 95, boxY + 160);
+        brush.setFont(new Font("Arial", Font.PLAIN, 18));
+        brush.drawString("Current Score: " + scoreManager.getScore(), boxX + 70, boxY + 90);
+        brush.drawString("High Score: " + scoreManager.getHighScore(), boxX + 78, boxY + 125);
+        brush.drawString("Lives Left: " + lives, boxX + 95, boxY + 160);
 
-    brush.setFont(new Font("Arial", Font.PLAIN, 16));
-    brush.drawString("Press P to Resume", boxX + 92, boxY + 195);
+        brush.setFont(new Font("Arial", Font.PLAIN, 16));
+        brush.drawString("Press P to Resume", boxX + 92, boxY + 195);
     }
+
+    /**
+     * Draws a heart shape at the given position, used for the lives display.
+     *
+     * @param brush the graphics context used for drawing
+     * @param cx the x center of the heart
+     * @param cy the y center of the heart
+     * @param s the size of the heart
+     */
+    private void drawHeart(Graphics brush, int cx, int cy, int s) {
+        brush.fillArc(cx - s, cy - s / 2, s, s, 0, 180);
+        brush.fillArc(cx, cy - s / 2, s, s, 0, 180);
+        int[] xp = {cx - s, cx + s, cx};
+        int[] yp = {cy, cy, cy + s};
+        brush.fillPolygon(xp, yp, 3);
+    }
+
     /**
      * Main entry point for the program.
      *
@@ -370,20 +380,16 @@ public class RocketRush extends Game {
     }
 
     /**
-     * Inner class that manages the current score and high score.
-     * The current score increases by 1 every second while playing,
-     * and increases by 5 whenever an orb is collected.
+     * Represents a floating score popup that appears when an orb is collected.
      */
-    private void drawHeart(Graphics brush, int cx, int cy, int s) {
-        brush.fillArc(cx - s, cy - s / 2, s, s, 0, 180);
-        brush.fillArc(cx, cy - s / 2, s, s, 0, 180);
-        int[] xp = {cx - s, cx + s, cx};
-        int[] yp = {cy, cy, cy + s};
-        brush.fillPolygon(xp, yp, 3);
-    }
-
     private class ScorePopup {
         int x, y, framesLeft;
+
+        /**
+         * Creates a new ScorePopup at the given position.
+         * @param x the x position of the popup
+         * @param y the y position of the popup
+         */
         ScorePopup(int x, int y) {
             this.x = x;
             this.y = y;
@@ -391,13 +397,16 @@ public class RocketRush extends Game {
         }
     }
 
+    /**
+     * Manages the current score and high score for the game.
+     */
     private class ScoreManager {
         private int score;
         private int highScore;
         private int frameCounter;
 
         /**
-         * Creates a new score manager.
+         * Creates a new ScoreManager with all values set to zero.
          */
         public ScoreManager() {
             score = 0;
@@ -406,8 +415,7 @@ public class RocketRush extends Game {
         }
 
         /**
-         * Updates the time-based score. Since the framework repaints
-         * roughly every tenth of a second, 10 frames is approximately 1 second.
+         * Increments the score by 1 approximately every second.
          */
         public void updateTimeScore() {
             frameCounter++;
@@ -418,14 +426,14 @@ public class RocketRush extends Game {
         }
 
         /**
-         * Adds the orb collection bonus.
+         * Adds the orb collection bonus to the score.
          */
         public void addOrbBonus() {
             score += 100;
         }
 
         /**
-         * Updates the high score if the current score is greater.
+         * Updates the high score if the current score exceeds it.
          */
         public void updateHighScore() {
             if (score > highScore) {
@@ -434,7 +442,7 @@ public class RocketRush extends Game {
         }
 
         /**
-         * Resets only the current run's score.
+         * Resets the current score and frame counter for a new run.
          */
         public void resetCurrentScore() {
             score = 0;
@@ -443,8 +451,7 @@ public class RocketRush extends Game {
 
         /**
          * Returns the current score.
-         *
-         * @return current score
+         * @return the current score
          */
         public int getScore() {
             return score;
@@ -452,11 +459,10 @@ public class RocketRush extends Game {
 
         /**
          * Returns the high score.
-         *
-         * @return high score
+         * @return the high score
          */
         public int getHighScore() {
             return Math.max(highScore, score);
-}
         }
+    }
 }
