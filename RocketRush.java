@@ -59,10 +59,13 @@ public class RocketRush extends Game {
                     resetGame();
                 }
 
-                if (code == KeyEvent.VK_P && gameState == GameState.PLAYING) {
-                    gameState = GameState.PAUSED;
-                } else if (code == KeyEvent.VK_P && gameState == GameState.PAUSED) {
-                    gameState = GameState.PLAYING;
+                if (code == KeyEvent.VK_P) {
+                    if (gameState == GameState.PLAYING) {
+                       gameState = GameState.PAUSED;
+                        stopShipInput();
+                    } else if (gameState == GameState.PAUSED) {
+                        gameState = GameState.PLAYING;
+                    }
                 }
 
                 if (ship != null) {
@@ -261,21 +264,18 @@ public class RocketRush extends Game {
 
         if (gameState == GameState.START) {
             drawCenteredMessage(
-                brush,
-                "Rocket Rush - Press ENTER to Start",
-                HEIGHT / 2
-            );
-        } else if (gameState == GameState.PAUSED) {
-            drawCenteredMessage(
-                brush,
-                "Paused - Press P to Resume",
-                HEIGHT / 2
-            );
+            brush,
+            "Rocket Rush - Press ENTER to Start",
+            HEIGHT / 2
+        );
+        } 
+        else if (gameState == GameState.PAUSED) {
+            drawPauseMenu(brush);
         } else if (gameState == GameState.GAME_OVER) {
             drawCenteredMessage(
-                brush,
-                "Game Over - Press R to Restart",
-                HEIGHT / 2
+            brush,
+            "Game Over - Press R to Restart",
+            HEIGHT / 2
             );
         }
 
@@ -324,6 +324,40 @@ public class RocketRush extends Game {
         brush.drawString(message, x, y);
     }
 
+    private void stopShipInput() {
+    if (ship != null) {
+        ship.setForwardPressed(false);
+        ship.setLeftPressed(false);
+        ship.setRightPressed(false);
+    }
+    }
+
+    private void drawPauseMenu(Graphics brush) {
+    brush.setColor(new Color(0, 0, 0, 170));
+    brush.fillRect(0, 0, WIDTH, HEIGHT);
+
+    int boxWidth = 320;
+    int boxHeight = 220;
+    int boxX = (WIDTH - boxWidth) / 2;
+    int boxY = (HEIGHT - boxHeight) / 2;
+
+    brush.setColor(Color.darkGray);
+    brush.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+
+    brush.setColor(Color.white);
+    brush.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+
+    brush.setFont(new Font("Arial", Font.BOLD, 28));
+    brush.drawString("PAUSED", boxX + 95, boxY + 40);
+
+    brush.setFont(new Font("Arial", Font.PLAIN, 18));
+    brush.drawString("Current Score: " + scoreManager.getScore(), boxX + 70, boxY + 90);
+    brush.drawString("High Score: " + scoreManager.getHighScore(), boxX + 78, boxY + 125);
+    brush.drawString("Lives Left: " + lives, boxX + 95, boxY + 160);
+
+    brush.setFont(new Font("Arial", Font.PLAIN, 16));
+    brush.drawString("Press P to Resume", boxX + 92, boxY + 195);
+    }
     /**
      * Main entry point for the program.
      *
@@ -417,7 +451,7 @@ public class RocketRush extends Game {
          * @return high score
          */
         public int getHighScore() {
-            return highScore;
+            return Math.max(highScore, score);
+}
         }
-    }
 }
