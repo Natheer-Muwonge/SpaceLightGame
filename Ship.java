@@ -2,6 +2,10 @@ package game;
 
 import java.awt.*;
 
+/**
+ * Represents the player's ship.
+ * Handles movement, rotation, and drawing based on keyboard input.
+ */
 class Ship extends Polygon {
 
     private static final double SPEED = 4.0;
@@ -11,14 +15,43 @@ class Ship extends Polygon {
     private boolean leftPressed = false;
     private boolean rightPressed = false;
 
+    /**
+     * Creates a new Ship with the given shape, position, and rotation.
+     * @param shape the points defining the ship's shape
+     * @param position the starting position of the ship
+     * @param rotation the initial rotation in degrees
+     */
     public Ship(Point[] shape, Point position, double rotation) {
         super(shape, position, rotation);
     }
 
-    public void setForwardPressed(boolean b) { forwardPressed = b; }
-    public void setLeftPressed(boolean b) { leftPressed = b; }
-    public void setRightPressed(boolean b) { rightPressed = b; }
+    /**
+     * Sets whether the forward key is pressed.
+     * @param b true if forward is pressed
+     */
+    public void setForwardPressed(boolean b) {
+        forwardPressed = b;
+    }
 
+    /**
+     * Sets whether the left key is pressed.
+     * @param b true if left is pressed
+     */
+    public void setLeftPressed(boolean b) {
+        leftPressed = b;
+    }
+
+    /**
+     * Sets whether the right key is pressed.
+     * @param b true if right is pressed
+     */
+    public void setRightPressed(boolean b) {
+        rightPressed = b;
+    }
+
+    /**
+     * Updates the ship's position and rotation based on current key input.
+     */
     public void move() {
         if (leftPressed) {
             rotation -= ROTATE_SPEED;
@@ -32,6 +65,11 @@ class Ship extends Polygon {
         }
     }
 
+    /**
+     * Wraps the ship to the opposite side of the screen if it goes off edge.
+     * @param width the screen width
+     * @param height the screen height
+     */
     public void wrapAround(int width, int height) {
         if (position.x < 0) {
             position.x = width;
@@ -47,6 +85,10 @@ class Ship extends Polygon {
         }
     }
 
+    /**
+     * Draws the ship as a white outline.
+     * @param brush the graphics context used for drawing
+     */
     public void draw(Graphics brush) {
         brush.setColor(Color.white);
         Point[] points = getPoints();
