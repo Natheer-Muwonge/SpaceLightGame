@@ -153,7 +153,9 @@ public class RocketRush extends Game {
             ScorePopup p = popupIter.next();
             p.y -= 1;
             p.framesLeft--;
-            if (p.framesLeft <= 0) popupIter.remove();
+            if (p.framesLeft <= 0) {
+                popupIter.remove();
+            }
         }
 
         handleCollisions();
@@ -194,6 +196,9 @@ public class RocketRush extends Game {
      * Handles collisions between the ship and other elements.
      */
     private void handleCollisions() {
+        if (ship == null) {
+            return;
+        }
         Iterator<Asteroid> asteroidIterator = asteroids.iterator();
         while (asteroidIterator.hasNext()) {
             Asteroid asteroid = asteroidIterator.next();
@@ -258,23 +263,12 @@ public class RocketRush extends Game {
         drawHud(brush);
 
         if (gameState == GameState.START) {
-            drawCenteredMessage(
-            brush,
-            "Rocket Rush - Press ENTER to Start",
-            HEIGHT / 2
-        );
-        } 
-        else if (gameState == GameState.PAUSED) {
+            drawCenteredMessage(brush, "Rocket Rush - Press ENTER to Start", HEIGHT / 2);
+        } else if (gameState == GameState.PAUSED) {
             drawPauseMenu(brush);
         } else if (gameState == GameState.GAME_OVER) {
-            drawCenteredMessage(
-            brush,
-            "Game Over - Press R to Restart",
-            HEIGHT / 2
-            );
+            drawCenteredMessage(brush, "Game Over - Press R to Restart", HEIGHT / 2);
         }
-
-        repaint();
     }
 
     /**
@@ -390,7 +384,11 @@ public class RocketRush extends Game {
 
     private class ScorePopup {
         int x, y, framesLeft;
-        ScorePopup(int x, int y) { this.x = x; this.y = y; this.framesLeft = 40; }
+        ScorePopup(int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.framesLeft = 40;
+        }
     }
 
     private class ScoreManager {
