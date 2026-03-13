@@ -153,9 +153,7 @@ public class RocketRush extends Game {
             ScorePopup p = popupIter.next();
             p.y -= 1;
             p.framesLeft--;
-            if (p.framesLeft <= 0) {
-                popupIter.remove();
-            }
+            if (p.framesLeft <= 0) popupIter.remove();
         }
 
         handleCollisions();
@@ -196,9 +194,6 @@ public class RocketRush extends Game {
      * Handles collisions between the ship and other elements.
      */
     private void handleCollisions() {
-        if (ship == null) {
-            return;
-        }
         Iterator<Asteroid> asteroidIterator = asteroids.iterator();
         while (asteroidIterator.hasNext()) {
             Asteroid asteroid = asteroidIterator.next();
@@ -279,6 +274,7 @@ public class RocketRush extends Game {
             );
         }
 
+        repaint();
     }
 
     /**
@@ -324,6 +320,10 @@ public class RocketRush extends Game {
         brush.drawString(message, x, y);
     }
 
+    /**
+    * Stops all current ship movement input so that the ship remains still
+    * while the game is paused.
+    */
     private void stopShipInput() {
     if (ship != null) {
         ship.setForwardPressed(false);
@@ -332,6 +332,13 @@ public class RocketRush extends Game {
     }
     }
 
+    /**
+    * Draws the pause menu overlay on the screen, including the current score,
+    * high score, remaining lives, and resume instructions.
+    *
+    * @param brush graphics brush used to draw the pause menu
+    */
+   
     private void drawPauseMenu(Graphics brush) {
     brush.setColor(new Color(0, 0, 0, 170));
     brush.fillRect(0, 0, WIDTH, HEIGHT);
